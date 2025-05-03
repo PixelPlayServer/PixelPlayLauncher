@@ -1,0 +1,28 @@
+:root {
+    --glass-bg: rgba(20,20,20,0.35);
+    --glass-blur: blur(20px) saturate(180%);
+    --accent: #1ec1f7;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html, body{width:100%;height:100%;font-family:'Segoe UI',sans-serif;background:transparent;overflow:hidden;}
+  .window{width:100%;height:100%;position:relative;}
+  #toolbar{position:absolute;top:0;left:0;right:0;height:32px;display:flex;justify-content:flex-end;align-items:center;background:rgba(0,0,0,0.3);-webkit-app-region:drag;}
+  #drag-area{flex:1;-webkit-app-region:drag;}
+  .controls button{width:20px;height:20px;margin:0 8px;background:rgba(255,255,255,0.15);border:none;border-radius:4px;cursor:pointer;transition:0.2s;-webkit-app-region:no-drag;}
+  .controls button:hover{background:rgba(255,255,255,0.3);}
+  .glass-container{position:absolute;top:32px;left:0;right:0;bottom:0;background:var(--glass-bg);backdrop-filter:var(--glass-blur);display:flex;flex-direction:column;align-items:center;padding:16px;}
+  .tabs{display:flex;gap:8px;margin-bottom:16px;}
+  .tab{padding:8px 16px;border:none;border-radius:8px;background:rgba(255,255,255,0.1);color:#fff;cursor:pointer;transition:0.2s;}
+  .tab.active, .tab:hover{background:var(--accent);}
+  .tab-content{width:100%;flex:1;overflow:auto;}
+  .tab-content ul{list-style:none;color:#e0e0e0;}
+  .tab-content li{margin-bottom:8px;}
+  .tab-content a{color:var(--accent);text-decoration:none;}
+  .tab-content a:hover{text-decoration:underline;}
+  .launch-area{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px 0;}
+  .avatar{width:80px;height:80px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);}
+  .launch-btn{position:relative;padding:16px 48px;font-size:18px;font-weight:bold;color:#fff;background:var(--accent);border:none;border-radius:12px;cursor:pointer;overflow:hidden;transition:filter 0.2s;}
+  .launch-btn:hover{filter:brightness(1.1);}
+  .launch-btn.ripple::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0.4);transform:scale(0);opacity:1;animation:ripple 0.6s forwards;}
+  @keyframes ripple{to{transform:scale(2);opacity:0;}}
+  

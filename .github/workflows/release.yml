@@ -1,0 +1,23 @@
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with: 'node-version: 18'
+      - name: Install deps
+        run: npm ci
+      - name: Build and Package
+        run: npm run dist
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with: draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: Upload Artifacts
+        uses: softprops/action-gh-release@v1

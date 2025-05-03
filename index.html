@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>PixelPlay Launcher</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="window" id="window">
+    <header id="toolbar">
+      <div id="drag-area"></div>
+      <div class="controls">
+        <button id="minimize">─</button>
+        <button id="close">×</button>
+      </div>
+    </header>
+
+    <div class="glass-container">
+      <div class="tabs">
+        <button data-tab="news" class="tab active">News</button>
+        <button data-tab="settings" class="tab">Settings</button>
+      </div>
+      <div class="tab-content" id="news">
+        <ul id="news-list">Cargando noticias…</ul>
+      </div>
+      <div class="tab-content" id="settings" style="display:none;">
+        <button id="login-btn" class="action-btn">Login Microsoft</button>
+        <p id="login-status"></p>
+      </div>
+
+      <div class="launch-area">
+        <img id="avatar" class="avatar" src="assets/default_avatar.png">
+        <button id="launch-btn" class="launch-btn">
+          <span>LAUNCH GAME</span>
+          <small id="launch-info">Not logged in</small>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  const { getCurrentWindow } = require('@electron/remote');
+  const win = getCurrentWindow();
+  document.getElementById('minimize').onclick = () => win.minimize();
+  document.getElementById('close').onclick    = () => win.close();
+
+  // Tabs
+  document.querySelectorAll('.tab').forEach(btn=>{
+    btn.onclick = ()=>{
+      document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(c=>c.style.display='none');
+      document.getElementById(btn.dataset.tab).style.display='block';
+    };
+  });
+
+  // Load news
+  fetch('https://raw.githubusercontent.com/PixelPlayServer/PixelPlayLauncher/main/news/news.json')
+    .then(r=>r.json())
+    .then(data=>{
+      const ul = document.getElementById('news-list'); ul.innerHTML='';
+      data.articles.forEach(a=>{
+        const li=document.createElement('li');
+        li.innerHTML = `<a href="${a.url}" target="_blank">${a.title}</a>`;
+        ul.appendChild(li);
+      });
+    }).catch(_=>{
+      document.getElementById('news-list').textContent='Error al cargar noticias';
+    });
+
+  // Login MS
+  document.getElementById('login-btn').onclick = async ()=>{
+    const status = document.getElementById('login-status');
+    status.textContent = 'Abriendo ventana de login...';
+    const token = await window.api.loginMS();
+    if(token.error) return status.textContent = 'Error: '+token.error;
+    status.textContent = 'Logueado ✅';
+    // Carga avatar
+    const user = token.account && token.account.username || token.access_token.slice(0,6);
+    document.getElementById('launch-info').textContent = `Playing as ${user}`;
+    fetch(`https://mc-heads.net/avatar/${user}`)
+      .then(r=>r.blob()).then(b=>document.getElementById('avatar').src=URL.createObjectURL(b));
+    window.currentAuth = token;
+  };
+
+  // Launch game
+  document.getElementById('launch-btn').onclick = async ()=>{
+    if(!window.currentAuth) return alert('Primero haz login');
+    document.getElementById('launch-info').textContent = 'Lanzando Minecraft…';
+    await window.api.launchMC(window.currentAuth);
+  };
+  </script>
+</body>
+</html>
