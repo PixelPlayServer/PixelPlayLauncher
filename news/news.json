@@ -1,7 +1,7 @@
 {
     "articles": [
-      { "title": "v1.0 lanzado", "url": "https://github.com/PixelPlayServer/PixelPlayLauncher/releases/tag/v1.0" },
-      { "title": "¡Modo Competitivo en camino!", "url": "https://pixelplayserver.com/blog/competitive" }
+      { "title": "test de noticia de cliente", "url": "https://github.com/PixelPlayServer/PixelPlayLauncher/" },
+      { "title": "hola - Joacoorandom", "url": "https://pixelplayserver.com/blog/competitive" }
     ]
   }
   
