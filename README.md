@@ -16,7 +16,7 @@ Un cliente hecho para el servidor de Minecraft Pixelplay!, se basa principalment
 
 
 
-## Deployment
+## Uso
 
 Para usar este launcher dentro del codigo source, debes copiar tu carpeta .minecraft dentro del root del proyecto, bajo el nombre de la carpeta "client", luego ejecuta estos comandos dentro del root de la carpeta:
 
