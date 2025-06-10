@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, initial-scale=1.0">    <meta http-equiv="Content-Security-Policy" 
+          content="default-src 'self'; 
+                   script-src 'self' 'unsafe-inline';
+                   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+                   font-src 'self' https://fonts.gstatic.com;
+                   img-src 'self' data: https://crafthead.net;">
+    <title>PixelPlay Launcher</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+:root {
+  /* Colores de fondo */
+  --bg-primary: #0c0c0c;        /* Fondo principal oscuro */
+  --bg-secondary: #1a1a1a;      /* Fondo secundario ligeramente más claro */
+  --bg-tertiary: #181a1b;       /* Fondo terciario para secciones destacadas */
+  --bg-card: #1f1f1f;           /* Fondo de tarjetas o contenedores */
+
+  /* Colores de acento */
+  --accent-primary: #2ecc40;    /* Verde vibrante */
+  --accent-secondary: #27ae60;  /* Verde más oscuro */
+  --accent-tertiary: #1abc9c;   /* Verde azulado (opcional, compatible) */
+  --accent-quaternary: #00bdd6; /* Azul cian (conservado si se quiere variedad) */
+  --accent-quinary: #3498db;    /* Azul intermedio (complementario al verde) */
+
+  /* Colores de texto */
+  --text-primary: #e0e0e0;      /* Texto principal claro */
+  --text-secondary: #bdbdbd;    /* Texto secundario gris claro */
+  --text-muted: #888888;        /* Texto atenuado gris medio */
+
+  /* Colores de estado */
+  --error-color: #e74c3c;       /* Rojo para errores */
+  --warning-color: #f1c40f;     /* Amarillo para advertencias */
+  --success-color: #2ecc40;     /* Verde para éxito */
+
+  /* Estilos adicionales */
+  --border-color: rgba(46, 204, 64, 0.2);             /* Borde con tono verde translúcido */
+  --shadow-light: 0 4px 20px rgba(46, 204, 64, 0.15); /* Sombra suave verde */
+  --shadow-heavy: 0 8px 40px rgba(0, 0, 0, 0.5);      /* Sombra pesada para profundidad */
+  --border-radius: 12px;        /* Radio de borde uniforme */
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Transición suave */
+
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(0, 212, 170, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(0, 184, 148, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .window-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 1000;
+        }
+
+        .window-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            opacity: 0.8;
+        }
+
+        .window-btn:hover { opacity: 1; transform: scale(1.1); }
+        .window-btn.close { background: #ff5f57; }
+        .window-btn.min { background: #ffbd2e; }
+        .window-btn.max { background: #28ca42; }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .main-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-heavy);
+            padding: 32px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.8s ease-out 0.2s both;
+        }
+
+        .tabs {
+            display: flex;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 24px;
+            gap: 4px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .tab.active {
+            background: var(--accent-primary);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        .tab:not(.active):hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        .auth-section {
+            display: none;
+        }
+
+        .auth-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 16px 24px;
+            border: 2px solid transparent;
+            border-radius: var(--border-radius);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .auth-btn:hover::before {
+            left: 100%;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-light);
+        }
+
+        .auth-btn:active {
+            transform: translateY(0);
+        }
+
+        .auth-btn.microsoft {
+            background: linear-gradient(135deg, #0078d4, #106ebe);
+        }
+
+        .auth-btn.nonpremium {
+            background: linear-gradient(135deg, var(--success-color), #00b4cc);
+        }
+
+        .auth-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-text {
+            margin: 16px 0;
+            padding: 12px;
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            text-align: center;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .status-text.success {
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--accent-primary);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+        }
+
+        .status-text.error {
+            background: rgba(255, 107, 107, 0.1);
+            color: var(--error-color);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+
+        .account-display {
+            display: none;
+            background: var(--bg-tertiary);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            margin: 16px 0;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .account-display.show {
+            display: flex;
+        }
+
+        .account-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+        }
+
+        .account-info {
+            flex: 1;
+        }
+
+        .account-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .account-type {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--error-color);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--error-color);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .logout-btn:hover {
+            background: var(--error-color);
+            color: var(--text-primary);
+        }
+
+        .play-btn {
+            width: 100%;
+            padding: 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            background: linear-gradient(135deg, var(--success-color), #00b4cc);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 16px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .play-btn.show {
+            display: flex;
+        }
+
+        .play-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(72, 202, 228, 0.3);
+        }
+
+        .config-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            animation: slideUp 0.8s ease-out 0.4s both;
+        }
+
+        .config-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .config-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .config-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .config-input {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            width: 100px;
+            text-align: center;
+        }
+
+        .config-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2);
+        }
+
+        .news-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            animation: slideUp 0.8s ease-out 0.6s both;
+        }
+
+        .news-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--accent-primary);
+        }
+
+        .news-item {
+            padding: 8px 0;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .news-item:last-child {
+            border-bottom: none;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            animation: slideUp 0.8s ease-out 0.8s both;
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 32px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            animation: modalSlide 0.3s ease-out;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--accent-primary);
+        }
+
+        .modal-text {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .device-code {
+            background: var(--bg-tertiary);
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin: 16px 0;
+            user-select: all;
+            border: 2px dashed var(--accent-primary);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-btn.primary {
+            background: var(--accent-primary);
+            color: var(--text-primary);
+        }
+
+        .modal-btn.secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .username-input {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .username-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes modalSlide {
+            from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container {
+                padding: 20px 16px;
+            }
+            
+            .main-card, .config-card, .news-card {
+                padding: 20px;
+            }
+            
+            .logo {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="window-controls">
+        <button class="window-btn min" onclick="minimizeWindow()"></button>
+        <button class="window-btn max" onclick="maximizeWindow()"></button>
+        <button class="window-btn close" onclick="closeWindow()"></button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">PixelPlay</div>
+            <div class="subtitle">Lanzador oficial de Pixelplay</div>
+        </div>
+
+        <div class="main-card">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('microsoft')">
+                    Cuenta de Microsoft
+                </button>
+                <button class="tab" onclick="switchTab('nonpremium')">
+                    Acceso No premium
+                </button>
+            </div>
+
+            <!-- Microsoft Login Section -->
+            <div id="microsoft-section" class="auth-section active">
+                <button id="microsoft-login-btn" class="auth-btn microsoft">
+                    <svg width="20" height="20" viewBox="0 0 23 23" fill="currentColor">
+                        <path d="M1 1h10v10H1z"/>
+                        <path d="M12 1h10v10H12z"/>
+                        <path d="M1 12h10v10H1z"/>
+                        <path d="M12 12h10v10H12z"/>
+                    </svg>
+                    Sign in with Microsoft
+                </button>
+                <div id="microsoft-status" class="status-text">Ready to sign in</div>
+                <div id="microsoft-account" class="account-display">
+                    <img id="microsoft-avatar" class="account-avatar" src="" alt="Avatar">
+                    <div class="account-info">
+                        <div id="microsoft-name" class="account-name"></div>
+                        <div class="account-type">Microsoft Account</div>
+                    </div>
+                    <button id="microsoft-logout" class="logout-btn">Sign Out</button>
+                </div>
+                <button id="microsoft-play" class="play-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    Launch Game
+                </button>
+            </div>
+
+            <!-- Microsoft Login Section (New) -->
+            <div class="auth-section" id="microsoft-auth-section">
+                <div id="ms-login-status"></div>
+                <div id="ms-account-rect" style="display:none;"></div>
+                <button id="ms-play-btn" class="auth-btn" style="display:none;">Play as Microsoft Account</button>
+            </div>
+
+            <!-- Offline Mode Section -->
+            <div id="nonpremium-section" class="auth-section">
+                <button id="nonpremium-login-btn" class="auth-btn nonpremium">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                    Play Offline
+                </button>
+                <div id="nonpremium-status" class="status-text">Ready to play offline</div>
+                <div id="nonpremium-account" class="account-display">
+                    <img id="nonpremium-avatar" class="account-avatar" src="" alt="Avatar">
+                    <div class="account-info">
+                        <div id="nonpremium-name" class="account-name"></div>
+                        <div class="account-type">Offline Mode</div>
+                    </div>
+                    <button id="nonpremium-logout" class="logout-btn">Clear</button>
+                </div>
+                <button id="nonpremium-play" class="play-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    Launch Game
+                </button>
+            </div>
+        </div>
+
+        <div class="config-card">
+            <div class="config-title">Game Settings</div>
+            <div class="config-row">
+                <label class="config-label">RAM Allocation (MB)</label>
+                <input id="ram-input" class="config-input" type="number" min="1024" max="16384" step="512" value="4096">
+            </div>            <div class="config-row">
+                <label class="config-label">Minecraft Version</label>
+                <select id="version-select" class="config-input" style="width: 140px;">
+                    <option value="">Loading versions...</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="news-card">
+            <div class="news-title">Novedades</div>
+            <div class="news-item">🎉 Demosle una bienvenida a Pixelplay launcher 2.3.0!</div>
+            <div class="news-item">✨ Rediseñado completo</div>
+            <div class="news-item">⚡ Estabilidad y mejoras</div>
+
+        </div>
+
+        <div class="footer">
+            © 2025 PixelPlay Launcher • Not affiliated with Mojang Studios or Microsoft
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Login successful!');
+                } else {
+                    alert('Login failed: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error during login:', error);
+                alert('An error occurred. Please try again later.');
+            }
+        });
+    </script>
+
+    <script>
+        // Global state
+        let currentAccount = null;
+        let isLoading = false;
+        let gameVersions = [];
+
+        // Load available versions
+        async function loadVersions() {
+            try {
+                const versions = await window.electronAPI.getVersions();
+                const versionSelect = document.getElementById('version-select');
+                if (!versionSelect) return;
+
+                versionSelect.innerHTML = '';
+                
+                // Sort versions with proper error handling
+                const sortedVersions = [...versions].sort((a, b) => {
+                    if (!a || !b) return 0;
+                    return String(b).localeCompare(String(a), undefined, {
+                        numeric: true,
+                        sensitivity: 'base'
+                    });
+                });
+
+                sortedVersions.forEach(version => {
+                    if (!version) return;
+                    const option = document.createElement('option');
+                    option.value = version;
+                    option.textContent = version;
+                    versionSelect.appendChild(option);
+                });
+
+                // Select first version by default
+                if (sortedVersions.length > 0) {
+                    versionSelect.value = sortedVersions[0];
+                }
+            } catch (error) {
+                console.error('Failed to load versions:', error);
+                const versionSelect = document.getElementById('version-select');
+                if (versionSelect) {
+                    versionSelect.innerHTML = '<option value="1.20.1">1.20.1</option>';
+                }
+            }
+        }
+
+        // Window controls
+        function minimizeWindow() {
+            if (window.electronAPI) {
+                window.electronAPI.windowAction('minimize');
+            }
+        }
+
+        function maximizeWindow() {
+            if (window.electronAPI) {
+                window.electronAPI.windowAction('maximize');
+            }
+        }
+
+        function closeWindow() {
+            if (window.electronAPI) {
+                window.electronAPI.windowAction('close');
+            }
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`.tab:nth-child(${tabName === 'microsoft' ? '1' : '2'})`).classList.add('active');
+            
+            // Update sections
+            document.querySelectorAll('.auth-section').forEach(section => section.classList.remove('active'));
+            document.getElementById(`${tabName}-section`).classList.add('active');
+        }
+
+        // Utility functions
+        function showStatus(elementId, message, type = 'default') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status-text ${type}`;
+        }        function showAccount(type, accountData) {            const accountElement = document.getElementById(`${type}-account`);
+            const avatarElement = document.getElementById(`${type}-avatar`);
+            const nameElement = document.getElementById(`${type}-name`);
+            const playButton = document.getElementById(`${type}-play`);
+            
+            // Ensure we have valid account data
+            if (!accountData) {
+                console.error('Account data is undefined');
+                return;
+            }
+
+            // Handle avatar url with proper fallbacks
+            const username = accountData.name || 'Steve';
+            const uuid = accountData.id || `${username}_offline`;
+            const avatarUrl = `https://crafthead.net/avatar/${uuid}`;
+            
+            avatarElement.src = avatarUrl;
+            nameElement.textContent = username;
+              // Fallback for avatar loading errors
+            avatarElement.onerror = () => {
+                avatarElement.src = `https://crafthead.net/avatar/steve`;
+            };
+            
+            accountElement.classList.add('show');
+            playButton.classList.add('show');
+            
+            currentAccount = { ...accountData, type };
+        }
+
+        function hideAccount(type) {
+            document.getElementById(`${type}-account`).classList.remove('show');
+            document.getElementById(`${type}-play`).classList.remove('show');
+            if (currentAccount?.type === type) {
+                currentAccount = null;
+            }
+        }
+
+        function setLoading(buttonId, loading) {
+            const button = document.getElementById(buttonId);
+            if (loading) {
+                button.disabled = true;
+                button.innerHTML = '<div class="loading-spinner"></div> Connecting...';
+            } else {
+                button.disabled = false;
+                // Reset button text based on type
+                if (buttonId.includes('microsoft')) {
+                    button.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 23 23" fill="currentColor">
+                            <path d="M1 1h10v10H1z"/>
+                            <path d="M12 1h10v10H12z"/>
+                            <path d="M1 12h10v10H1z"/>
+                            <path d="M12 12h10v10H12z"/>
+                        </svg>
+                        Sign in with Microsoft
+                    `;
+                } else {
+                    button.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                        Play Offline
+                    `;
+                }
+            }
+        }
+
+        // Microsoft Authentication
+        async function microsoftLogin() {
+            if (isLoading) return;
+            
+            const msStatus = document.getElementById('microsoft-status');
+            setLoading('microsoft-login-btn', true);
+            showStatus('microsoft-status', 'Starting Microsoft authentication...', 'default');
+            
+            try {
+                if (!window.electronAPI?.microsoftLoginStart) {
+                    throw new Error('Microsoft login not available');
+                }
+
+                // Listen for device code
+                window.electronAPI.onDeviceCode((data) => {
+                    if (data.userCode && data.verificationUri) {
+                        const message = `
+                            <p>To sign in, use a web browser to open <a href="${data.verificationUri}" target="_blank">${data.verificationUri}</a></p>
+                            <p>Enter the code: <strong>${data.userCode}</strong></p>
+                            <p>Code expires in ${Math.floor(data.expiresIn / 60)} minutes</p>
+                        `;
+                        showStatus('microsoft-status', message, 'info');
+                    }
+                });
+
+                const result = await window.electronAPI.microsoftLoginStart();
+                
+                if (result.success) {
+                    const account = {
+                        ...result.profile,
+                        type: 'microsoft'
+                    };
+                    showAccount('microsoft', account);
+                    showStatus('microsoft-status', `Successfully signed in as ${result.profile.name}`, 'success');
+                    
+                    // Save session
+                    if (window.electronAPI?.store) {
+                        await window.electronAPI.store.set('lastAccount', JSON.stringify(account));
+                    }
+                } else {
+                    throw new Error(result.error || 'Failed to authenticate');
+                }
+            } catch (error) {
+                console.error('Microsoft login failed:', error);
+                showStatus('microsoft-status', `Login failed: ${error.message}`, 'error');
+            } finally {
+                setLoading('microsoft-login-btn', false);
+                isLoading = false;
+            }
+        }
+
+        function microsoftLogout() {
+            hideAccount('microsoft');
+            showStatus('microsoft-status', 'Signed out successfully', 'default');
+            
+            if (window.electronAPI?.store) {
+                window.electronAPI.store.delete('lastAccount');
+            }
+        }
+
+        // Offline Mode
+        function nonpremiumLogin() {
+            showUsernameModal((username) => {                const profile = {
+                    name: username,
+                    id: `offline-${username.toLowerCase()}-${Date.now().toString(36)}`,
+                    skinUrl: `https://crafthead.net/avatar/${username}`,
+                };
+                
+                showAccount('nonpremium', profile);
+                showStatus('nonpremium-status', `Playing as ${username}`, 'success');
+                
+                // Save session
+                if (window.electronAPI?.store) {
+                    window.electronAPI.store.set('lastAccount', JSON.stringify({
+                        ...profile,
+                        type: 'nonpremium'
+                    }));
+                }
+            });
+        }
+
+        function nonpremiumLogout() {
+            hideAccount('nonpremium');
+            showStatus('nonpremium-status', 'Ready to play offline', 'default');
+            
+            if (window.electronAPI?.store) {
+                window.electronAPI.store.delete('lastAccount');
+            }
+        }
+
+        // Game Launch
+        async function launchGame() {
+            if (!currentAccount) {
+                showModal('Error', 'Please sign in or set up offline mode first.', [{
+                    text: 'OK',
+                    class: 'primary',
+                    action: () => hideModal()
+                }]);
+                return;
+            }
+            
+            const ramMB = parseInt(document.getElementById('ram-input').value);
+            const version = document.getElementById('version-select').value;
+            
+            try {
+                showStatus(`${currentAccount.type}-status`, 'Launching game...', 'default');
+                
+                if (window.electronAPI?.launchMinecraft) {
+                    const result = await window.electronAPI.launchMinecraft({
+                        account: currentAccount,
+                        ramMB,
+                        version
+                    });
+                    
+                    showStatus(`${currentAccount.type}-status`, 'Game launched successfully!', 'success');
+                } else {
+                    throw new Error('Game launch not available');
+                }
+                
+            } catch (error) {
+                console.error('Launch failed:', error);
+                showStatus(`${currentAccount.type}-status`, `Launch failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Modal Functions
+        let activeModal = null;
+
+        function showModal(title, message, buttons = []) {
+            if (activeModal) hideModal();
+
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            activeModal = modal;
+
+            const content = `
+                <div class="modal-content">
+                    <div class="modal-title">${title}</div>
+                    <div class="modal-text">${message}</div>
+                    <div class="modal-buttons">
+                        ${buttons.map(btn => `
+                            <button class="modal-btn ${btn.class}" onclick="handleModalButton(${buttons.indexOf(btn)})">${btn.text}</button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            modal.innerHTML = content;
+            document.body.appendChild(modal);
+
+            // Store button actions
+            window.modalActions = buttons.map(btn => btn.action);
+        }
+
+        function hideModal() {
+            if (activeModal) {
+                activeModal.remove();
+                activeModal = null;
+            }
+            window.modalActions = [];
+        }
+
+        function handleModalButton(index) {
+            if (window.modalActions?.[index]) {
+                window.modalActions[index]();
+            }
+            hideModal();
+        }
+
+        function showUsernameModal(callback) {
+            if (activeModal) hideModal();
+
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            activeModal = modal;
+
+            const content = `
+                <div class="modal-content">
+                    <div class="modal-title">Enter Username</div>
+                    <div class="modal-text">Choose a username for offline play (3-16 characters, letters and numbers only)</div>
+                    <input type="text" class="username-input" id="username-input" maxlength="16" placeholder="Username">
+                    <div class="modal-buttons">
+                        <button class="modal-btn secondary" onclick="hideModal()">Cancel</button>
+                        <button class="modal-btn primary" onclick="handleUsername()">Continue</button>
+                    </div>
+                </div>
+            `;
+
+            modal.innerHTML = content;
+            document.body.appendChild(modal);
+
+            const input = document.getElementById('username-input');
+            input.focus();
+
+            // Store callback
+            window.usernameCallback = callback;
+
+            // Add enter key handler
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleUsername();
+                }
+            });
+        }
+
+        function handleUsername() {
+            const input = document.getElementById('username-input');
+            const username = input.value.trim();
+
+            if (username.length < 3 || username.length > 16 || !/^[a-zA-Z0-9_]+$/.test(username)) {
+                input.style.borderColor = 'var(--error-color)';
+                return;
+            }
+
+            if (window.usernameCallback) {
+                window.usernameCallback(username);
+            }
+            hideModal();
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Load game versions first
+            await loadVersions();
+            
+            // Microsoft login button
+            document.getElementById('microsoft-login-btn').addEventListener('click', microsoftLogin);
+            document.getElementById('microsoft-logout').addEventListener('click', microsoftLogout);
+            document.getElementById('microsoft-play').addEventListener('click', launchGame);
+
+            // Offline mode buttons
+            document.getElementById('nonpremium-login-btn').addEventListener('click', nonpremiumLogin);
+            document.getElementById('nonpremium-logout').addEventListener('click', nonpremiumLogout);
+            document.getElementById('nonpremium-play').addEventListener('click', launchGame);
+
+            // Restore last session if available
+            if (window.electronAPI?.store) {
+                window.electronAPI.store.get('lastAccount').then(accountJson => {
+                    if (accountJson) {
+                        try {
+                            const account = JSON.parse(accountJson);
+                            showAccount(account.type, account);
+                            showStatus(`${account.type}-status`, `Welcome back, ${account.name}!`, 'success');
+                            switchTab(account.type);
+                        } catch (error) {
+                            console.error('Failed to restore session:', error);
+                        }
+                    }
+                });
+            }
+
+            // Load game versions
+            loadVersions();
+        });
+    </script>
+</body>
+</html>
